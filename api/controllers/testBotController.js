@@ -1,6 +1,5 @@
 'use strict';
 
-
 const mongoose = require('mongoose'),
     Task = mongoose.model('Tasks');
 
