@@ -15,6 +15,7 @@
   "dependencies": {
     "express": "^4.16.2",
     "mongoose": "^4.13.2",
-    "node.bittrex.api": "^1.0.0"
+    "node.bittrex.api": "^1.0.0",
+    "winston": "^2.4.0"
   }
 }
