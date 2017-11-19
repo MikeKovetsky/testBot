@@ -26,13 +26,15 @@ function _getCurrency(currencies, currencyTitle) {
 // }
 
 exports.getProfit = async function (req, res) {
-    const usdAmount = 10000000;
-    const btcCurrencies = await client.get(`${KUCOIN_API}/open/currencies?coins=BTC`);
+    const usdAmount = 100000;
+    const [btcCurrencies, neoCurrencies, bittrexHistory] = await Promise.all([
+        client.get(`${KUCOIN_API}/open/currencies?coins=BTC`),
+        client.get(`${KUCOIN_API}/open/currencies?coins=NEO`),
+        client.get(`${BITTREX_API}/public/getmarkethistory?market=BTC-NEO`)
+    ]);
     const btcInUsd = btcCurrencies['data']['rates']['BTC']['USD'];
-    const beoCurrencies = await client.get(`${KUCOIN_API}/open/currencies?coins=NEO`);
-    const neoInUsd = beoCurrencies['data']['rates']['NEO']['USD'];
+    const neoInUsd = neoCurrencies['data']['rates']['NEO']['USD'];
     const neoInBtc = neoInUsd / btcInUsd;
-    const bittrexHistory = await client.get(`${BITTREX_API}/public/getmarkethistory?market=BTC-NEO`);
     const bittrexLastTrade = bittrexHistory['result'][0];
     const btcProfit = bittrexLastTrade["Price"] - neoInBtc;
     const totalProfit = btcProfit * usdAmount;
