@@ -3,6 +3,7 @@
 const log = require('../libs/log')(module);
 const bittrex = require('node.bittrex.api');
 const client = require('../libs/client');
+const SHA512 = require("crypto-js/sha512");
 
 const BITTREX_API_KEY = 'b8171d8903844ec6b275641bd5c5d36b';
 const BITTREX_API = 'https://bittrex.com/api/v1.1';
@@ -25,12 +26,27 @@ function _getCurrency(currencies, currencyTitle) {
 // }
 
 exports.getProfit = async function (req, res) {
-    const pair = ['BTC', 'NEO'];
-    const history = await client.get(`${BITTREX_API}/public/getmarkethistory?market=BTC-NEO`);
-    const bittrexLastTrade = history['result'][0];
-    const currencies = await client.get(BITTREX_API + '/public/getcurrencies');
-    const bittrexNeoInfo = _getCurrency(currencies['result'], pair[1]);
-    const kucoinNeoInfo = await client.get(`${KUCOIN_API}/market/open/coin-info?coin=${pair[1]}`);
-    const balance = await client.get(BITTREX_API + '/account/getbalances?apikey=' + BITTREX_API_KEY + '&nonce=' + new Date());
-    res.send(balance);
+    const usdAmount = 10000000;
+    const btcCurrencies = await client.get(`${KUCOIN_API}/open/currencies?coins=BTC`);
+    const btcInUsd = btcCurrencies['data']['rates']['BTC']['USD'];
+    const beoCurrencies = await client.get(`${KUCOIN_API}/open/currencies?coins=NEO`);
+    const neoInUsd = beoCurrencies['data']['rates']['NEO']['USD'];
+    const neoInBtc = neoInUsd / btcInUsd;
+    const bittrexHistory = await client.get(`${BITTREX_API}/public/getmarkethistory?market=BTC-NEO`);
+    const bittrexLastTrade = bittrexHistory['result'][0];
+    const btcProfit = bittrexLastTrade["Price"] - neoInBtc;
+    const totalProfit = btcProfit * usdAmount;
+    console.log(totalProfit);
+    res.json({totalProfit});
+    // const bittrexCurrencies = await client.get(BITTREX_API + '/public/getcurrencies');
+    // const pair = ['BTC', 'NEO'];
+    // const bittrexNeoInfo = _getCurrency(currencies['result'], pair[1]);
+    // const kucoinNeoInfo = await client.get(`${KUCOIN_API}/market/open/coin-info?coin=${pair[1]}`);
+    // bittrex.getbalances( function( data, err ) {
+    //     if (!data) {
+    //         res.send('No balance found on Bittrex');
+    //     } else {
+    //         res.send(data);
+    //     }
+    // });
 };
