@@ -19,4 +19,7 @@ module.exports = function(app) {
 
     app.route('/bot/profit')
         .get(bot.getProfit);
+
+    app.route('/bot/interval')
+        .get(bot.getIntervalProfit);
 };

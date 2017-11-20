@@ -19,6 +19,7 @@ function _getCurrency(currencies, currencyTitle) {
         return currency['Currency'] === currencyTitle;
     })
 }
+
 // {
 //     "KC-API-KEY": "5a0c6863323292218ac26b06",
 //     "KC-API-NONCE" : new Date().getTime(),
@@ -51,4 +52,10 @@ exports.getProfit = async function (req, res) {
     //         res.send(data);
     //     }
     // });
+};
+
+exports.getIntervalProfit = async function (req, res) {
+    setInterval(function () {
+        client.get('http://localhost:3000/bot/profit')
+    }, 1000);
 };
